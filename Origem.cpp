@@ -25,26 +25,26 @@ typedef struct {
 	char nome[100];
 }disciplina;
 
-//variaveis globais
-aluno alunos[100];
-professor professores[100];
-disciplina disciplinas[100];
-int indiceAluno = 0, indiceProf = 0, indiceDis = 0;
+aluno buscarAluno(int ra, int tamanho, aluno *alunos); //busca um aluno atravez do ra
+int existeAluno(int ra, int tamanho, aluno *alunos);
+void imprimeAlunos(int tamanho, aluno *alunos);
 
-aluno buscarAluno(int ra); //busca um aluno atravez do ra
-int existeAluno(int ra); 
-void imprimeAlunos();
+professor buscarProfessor(int rg, int tamanho, professor *professores); //busca um professor atravez do rg
+int existeProfessor(int rg, int tamanho, professor *professores);
+void imprimeProfessores(int tamanho, professor *professores);
 
-professor buscarProfessor(int rg); //busca um professor atravez do rg
-int existeProfessor(int rg);
-void imprimeProfessores();
-
-disciplina buscarDisciplina(int cod); //busca uma disciplina atravez do cod
-int existeDisciplina(int cod);
-void imprimeDisciplinas();
+disciplina buscarDisciplina(int cod, int tamanho, disciplina *disciplinas); //busca uma disciplina atravez do cod
+int existeDisciplina(int cod, int tamanho, disciplina *disciplinas);
+void imprimeDisciplinas(int tamanho, disciplina *disciplinas);
 
 void main() {
-	int opcao, i, qtd,  
+	//variaveis globais
+	aluno alunos[100];
+	professor professores[100];
+	disciplina disciplinas[100];
+	int indiceAluno = 0, indiceProf = 0, indiceDis = 0;
+
+	int opcao, i, qtd,
 		qtdAluno, raAtual,
 		qtdProf, rgAtual,
 		qtdDis, codAtual;
@@ -72,7 +72,7 @@ void main() {
 			for (i = 0; i < qtd; i++) {
 				printf("Digite o ra do aluno\n");
 				scanf("%d", &raAtual);
-				if (existeAluno(raAtual) == 0) {
+				if (existeAluno(raAtual, indiceAluno, alunos) == 0) {
 					alunos[indiceAluno].ra = raAtual;
 					printf("Digite o nome do aluno\n");
 					scanf("%s", alunos[indiceAluno].nome);
@@ -94,7 +94,7 @@ void main() {
 			for (i = 0; i < qtd; i++) {
 				printf("Digite o rg do professor\n");
 				scanf("%d", &rgAtual);
-				if (existeProfessor(rgAtual) == 0) {
+				if (existeProfessor(rgAtual, indiceProf, professores) == 0) {
 					professores[indiceProf].rg = rgAtual;
 					printf("Digite o nome do professor\n");
 					scanf("%s", professores[indiceProf].nome);
@@ -102,7 +102,8 @@ void main() {
 					printf("Professor cadastrado com sucesso!\n");
 
 					indiceProf++;
-				}else {
+				}
+				else {
 					printf("Professor ja cadastrado!\n");
 					i--;
 				}
@@ -115,7 +116,7 @@ void main() {
 			for (i = 0; i < qtd; i++) {
 				printf("Digite o cod da disciplina\n");
 				scanf("%d", &codAtual);
-				if (existeDisciplina(codAtual) == 0) {
+				if (existeDisciplina(codAtual, indiceDis, disciplinas) == 0) {
 					disciplinas[indiceDis].cod = codAtual;
 					printf("Digite o nome da disciplina\n");
 					scanf("%s", disciplinas[indiceDis].nome);
@@ -123,7 +124,8 @@ void main() {
 					printf("Disciplina cadastrada com sucesso!\n");
 
 					indiceDis++;
-				}else {
+				}
+				else {
 					printf("Disciplina ja cadastrado!\n");
 					i--;
 				}
@@ -139,13 +141,13 @@ void main() {
 		case cancelarProfessor:
 			break;
 		case imprimirAluno:
-			imprimeAlunos();
+			imprimeAlunos(indiceAluno, alunos);
 			break;
 		case imprimirProfessor:
-			imprimeProfessores();
+			imprimeProfessores(indiceProf, professores);
 			break;
 		case imprimirDisciplina:
-			imprimeDisciplinas();
+			imprimeDisciplinas(indiceDis, disciplinas);
 			break;
 		case sair:
 			break;
@@ -158,9 +160,9 @@ void main() {
 
 }
 
-int existeAluno(int ra) {
+int existeAluno(int ra, int tamanho, aluno *alunos) {
 	int j;
-	for (j = 0; j < 100; j++) {
+	for (j = 0; j < tamanho; j++) {
 		if (alunos[j].ra == ra) {
 			return 1; //true
 		}
@@ -169,25 +171,25 @@ int existeAluno(int ra) {
 
 }
 
-aluno buscarAluno(int ra) {
+aluno buscarAluno(int ra, int tamanho, aluno *alunos) {
 	int j;
-	for (j = 0; j < 100; j++) {
+	for (j = 0; j < tamanho; j++) {
 		if (alunos[j].ra == ra) {
 			return alunos[j];
 		}
 	}
 }
 
-void imprimeAlunos() {
+void imprimeAlunos(int tamanho, aluno *alunos) {
 	int j;
 	printf("RA        NOME\n");
-	for (j = 0; j < indiceAluno; j++) {
+	for (j = 0; j < tamanho; j++) {
 		printf("%d         %s\n", alunos[j].ra, alunos[j].nome);
 	}
 }
-int existeProfessor(int rg) {
+int existeProfessor(int rg, int tamanho, professor *professores) {
 	int j;
-	for (j = 0; j < 100; j++) {
+	for (j = 0; j < tamanho; j++) {
 		if (professores[j].rg == rg) {
 			return 1; //true
 		}
@@ -196,26 +198,26 @@ int existeProfessor(int rg) {
 
 }
 
-professor buscarProfessor(int rg){
+professor buscarProfessor(int rg, int tamanho, professor *professores) {
 	int j;
-	for (j = 0; j < 100; j++) {
+	for (j = 0; j < tamanho; j++) {
 		if (professores[j].rg == rg) {
 			return professores[j];
 		}
 	}
 }
 
-void imprimeProfessores() {
+void imprimeProfessores(int tamanho, professor *professores) {
 	int j;
 	printf("RG        NOME\n");
-	for (j = 0; j < indiceProf; j++) {
+	for (j = 0; j < tamanho; j++) {
 		printf("%d         %s\n", professores[j].rg, professores[j].nome);
 	}
 }
 
-int existeDisciplina(int cod) {
+int existeDisciplina(int cod, int tamanho, disciplina *disciplinas) {
 	int j;
-	for (j = 0; j < 100; j++) {
+	for (j = 0; j < tamanho; j++) {
 		if (disciplinas[j].cod == cod) {
 			return 1; //true
 		}
@@ -224,19 +226,19 @@ int existeDisciplina(int cod) {
 
 }
 
-disciplina buscarDisciplina(int cod) {
+disciplina buscarDisciplina(int cod, int tamanho, disciplina *disciplinas) {
 	int j;
-	for (j = 0; j < 100; j++) {
+	for (j = 0; j < tamanho; j++) {
 		if (disciplinas[j].cod == cod) {
 			return disciplinas[j];
 		}
 	}
 }
 
-void imprimeDisciplinas() {
+void imprimeDisciplinas(int tamanho, disciplina *disciplinas) {
 	int j;
 	printf("COD       NOME\n");
-	for (j = 0; j < indiceDis; j++) {
+	for (j = 0; j < tamanho; j++) {
 		printf("%d         %s\n", disciplinas[j].cod, disciplinas[j].nome);
 	}
 }
