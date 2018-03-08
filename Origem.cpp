@@ -6,7 +6,7 @@
 
 enum menu
 {
-	cadAluno = 1, cadProfessor, cadDisciplina, matricularAluno, alocarProfessor, cancelarAluno, cancelarProfessor, imprimirAluno, imprimirProfessor, imprimirDisciplina, imprimirDiscAluno, imprimirAlunoDisc, sair
+	cadAluno = 1, cadProfessor, cadDisciplina, matricularAluno, alocarProfessor, cancelarAluno, cancelarProfessor, imprimirAluno, imprimirProfessor, imprimirDisciplina, imprimirDiscAluno, imprimirAlunoDisc, imprimirDiscProf, imprimirProfDisc, sair
 };
 typedef struct {
 	int ra;
@@ -44,8 +44,12 @@ void imprimeDisciplinas(int tamanho, disciplina *disciplinas);
 void matricularAlunos(int posAluno, aluno *alunos, int tamanho, int *grupoDisciplinas);
 int cursando(aluno alunoAtual);
 void alocarProfessores(int posProf, professor *professores, int qtdDis, int *grupoDisciplinas);
+
 void imprimirDisciplinasDeAluno(int posAluno, aluno *alunos);
 void imprimirAlunosPorDisciplina(int codAtual, int tamanho, aluno *alunos);
+
+void imprimirDisciplinasDeProf(int posProf, professor *professores);
+void imprimirProfPorDisciplina(int codAtual, int tamanho, professor *professores);
 
 void cancelarDisciplina(int tamanho, aluno *alunos, int qtdDis, int *grupoDisciplinas);
 void excluiDoVetor(int posAluno, int posDisc, aluno *alunos);
@@ -69,13 +73,15 @@ void main() {
 		printf("%d) Cadastrar Disciplina.\n", cadDisciplina);
 		printf("%d) Matricular aluno(s).\n", matricularAluno);
 		printf("%d) Alocar professor(es).\n", alocarProfessor);
-		printf("%d) Cancelar  matricula.\n", cancelarAluno);
-		printf("%d) Cancelar  alocacao.\n", cancelarProfessor);
+		printf("%d) Cancelar  Matricula.\n", cancelarAluno);
+		printf("%d) Cancelar  Alocacao.\n", cancelarProfessor);
 		printf("%d) Imprimir  Aluno.\n", imprimirAluno);
 		printf("%d) Imprimir  Professor.\n", imprimirProfessor);
 		printf("%d) Imprimir  Disciplina.\n", imprimirDisciplina);
 		printf("%d) Imprimir  Disciplina de um aluno desejado.\n", imprimirDiscAluno);
 		printf("%d) Imprimir  Aluno de uma disciplina desejada.\n", imprimirAlunoDisc);
+		printf("%d) Imprimir  Disciplina de um professor desejado.\n", imprimirDiscProf);
+		printf("%d) Imprimir  Professor de uma disciplina desejada.\n", imprimirProfDisc);
 		printf("%d) Sair.\n", sair);
 		scanf("%d", &opcao);
 
@@ -113,7 +119,7 @@ void main() {
 					professores[indiceProf].rg = rgAtual;
 					printf("Digite o nome do professor\n");
 					scanf("%s", professores[indiceProf].nome);
-
+					professores[indiceProf].qtdDisci = 0;
 					printf("Professor cadastrado com sucesso!\n");
 
 					indiceProf++;
@@ -216,7 +222,7 @@ void main() {
 				printf("Digite rg do professor:\n");
 				scanf("%d", &rgAtual);
 				if (existeProfessor(rgAtual, indiceProf, professores) == 1) {
-					alocarProfessores(buscarProfessor(raAtual, indiceAluno, professores), professores, qtdDis, grupoDisciplina);
+					alocarProfessores(buscarProfessor(rgAtual, indiceProf, professores), professores, qtdDis, grupoDisciplina);
 				}
 				else {
 					printf("Professores nao cadastrado!\n");
@@ -290,13 +296,31 @@ void main() {
 		case imprimirAlunoDisc:
 			printf("Digite codigo da disciplina:\n");
 			scanf("%d", &codAtual);
-
 			if (existeDisciplina(codAtual, indiceDis, disciplinas) == 1) {
 				imprimirAlunosPorDisciplina(codAtual, indiceAluno, alunos);
 			}
 			else {
 				printf("Disciplina nao cadastrada!\n");
-
+			}
+			break;
+		case imprimirDiscProf:
+			printf("Digite rg do professor:\n");
+			scanf("%d", &rgAtual);
+			if (existeProfessor(rgAtual, indiceProf, professores) == 1) {
+				imprimirDisciplinasDeProf(buscarProfessor(rgAtual, indiceProf, professores), professores);
+			}
+			else {
+				printf("Professor nao cadastrado!\n");
+			}
+			break;
+		case imprimirProfDisc:
+			printf("Digite codigo da disciplina:\n");
+			scanf("%d", &codAtual);
+			if (existeDisciplina(codAtual, indiceDis, disciplinas) == 1) {
+				imprimirProfPorDisciplina(codAtual, indiceProf, professores);
+			}
+			else {
+				printf("Disciplina nao cadastrada!\n");
 			}
 			break;
 		case sair:
@@ -525,20 +549,21 @@ void cancelarDisciplina(int posAluno, aluno *alunos, int qtdDis, int *grupoDisci
 void alocarProfessores(int posProf, professor *professores, int qtdDis, int *grupoDisciplinas) {
 	int j, k = 0, materias, l = 0;
 	materias = professores[posProf].qtdDisci;
+	printf("%d", materias);
 	if (materias >= 20) {
 		printf("Este professor ja esta cadastrado em muitas disiciplinas!\n");
 	}
 	else {
 		if (materias == 0) {
 			for (j = 0; j < qtdDis; j++) {
-				professores[posProf].disciplinas[j] = grupoDisciplinas[l];
+				professores[posProf].disciplinas[j] = grupoDisciplinas[j];
 				professores[posProf].qtdDisci++;
-				l++;
+				//l++;
 			}
 
 		}
 		else {
-			for (j = materias - 1; j < 20; j++) {
+			for (j = (materias - 1); j < 20; j++) {
 				if (l >= qtdDis) {
 					j = 20;
 				}
@@ -558,5 +583,32 @@ void alocarProfessores(int posProf, professor *professores, int qtdDis, int *gru
 			//}
 		}
 
+	}
+}
+
+void imprimirDisciplinasDeProf(int posProf, professor *professores) {
+	int j;
+	printf("--------------Disciplinas---------------\n");
+	if (professores[posProf].qtdDisci > 0) {
+		for (j = 0; j < professores[posProf].qtdDisci; j++) {
+			printf("%d\n", professores[posProf].disciplinas[j]);
+		}
+	}
+	else {
+		printf("Este professor nao esta cadastrado em nenhuma disciplina!\n");
+	}
+
+}
+void imprimirProfPorDisciplina(int codAtual, int tamanho, professor *professores) {
+	int j, k;
+	printf("--------------Professores---------------\n");
+	for (j = 0; j < tamanho; j++) {
+		if (professores[j].qtdDisci > 0) {
+			for (k = 0; k < professores[j].qtdDisci; k++) {
+				if (professores[j].disciplinas[k] == codAtual) {
+					printf("%d\n", professores[j].rg);
+				}
+			}
+		}
 	}
 }
