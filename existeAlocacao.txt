@@ -1,0 +1,9 @@
+int existeAlocacao(int cod, int tamanho, professor *professores) {
+	int k;
+	for (k = 0; k < professores[tamanho].qtdDisci; k++) {
+		if (professores[tamanho].disciplinas[k] == cod) {
+			return 1;// true existe
+		}
+	}
+	return 0;
+}
