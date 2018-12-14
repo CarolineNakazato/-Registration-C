@@ -54,6 +54,12 @@ void imprimirProfPorDisciplina(int codAtual, int tamanho, professor *professores
 void cancelarDisciplina(int tamanho, aluno *alunos, int qtdDis, int *grupoDisciplinas);
 void excluiDoVetor(int posAluno, int posDisc, aluno *alunos);
 
+void cancelarDisciplina2(int tamanho, professor *professores, int qtdDis, int *grupoDisciplinas);
+void excluiDoVetor2(int posProf, int posDisc, professor *professores);
+
+int existeNoVetor(int tamanho, int *vetor, int valorAtual);
+
+
 void main() {
 	//variaveis globais
 	aluno alunos[100];
@@ -155,7 +161,12 @@ void main() {
 			break;
 		case matricularAluno:
 
-			do
+			if ((indiceAluno && indiceDis) == 0) {
+				printf("Aluno e/ou disciplna nao cadastrado\n");
+				printf("Cadastre pelo menos um em cada categoria para poder realizar a matricula\n");
+			}
+			else {
+				do
 			{
 				printf("Digite quantas disciplinas serao matriculadas:\n");
 				scanf("%d", &qtdDis);
@@ -167,7 +178,13 @@ void main() {
 				printf("Digite codigo da disciplina:\n");
 				scanf("%d", &codAtual);
 				if (existeDisciplina(codAtual, indiceDis, disciplinas) == 1) {
-					grupoDisciplina[i] = codAtual;
+					if (existeNoVetor(i, grupoDisciplina, codAtual) == 0) {
+						grupoDisciplina[i] = codAtual;
+					}
+					else {
+						printf("Disciplina ja esta no grupo\n");
+						i--;
+					}
 				}
 				else {
 					printf("Disciplina nao cadastrado!\n");
@@ -190,10 +207,15 @@ void main() {
 					i--;
 				}
 			}
-
+			}
 
 			break;
 		case alocarProfessor:
+			if ((indiceProf && indiceDis) == 0) {
+				printf("Professor e/ou disciplna nao cadastrado\n");
+				printf("Cadastre pelo menos um em cada categoria para poder realizar a alocacao\n");
+			}
+			else {
 			do
 			{
 				printf("Digite quantas disciplinas serao alocadas:\n");
@@ -206,7 +228,13 @@ void main() {
 				printf("Digite codigo da disciplina:\n");
 				scanf("%d", &codAtual);
 				if (existeDisciplina(codAtual, indiceDis, disciplinas) == 1) {
-					grupoDisciplina[i] = codAtual;
+					if ((existeNoVetor(i, grupoDisciplina, codAtual) == 0)) {
+						grupoDisciplina[i] = codAtual;
+					}
+					else {
+						printf("Disciplina ja esta no grupo\n");
+						i--;
+					}
 				}
 				else {
 					printf("Disciplina nao cadastrado!\n");
@@ -228,13 +256,60 @@ void main() {
 					printf("Professores nao cadastrado!\n");
 					i--;
 				}
+				}
 			}
+
+
 
 			break;
 		case cancelarAluno:
+			if ((indiceAluno && indiceDis) == 0) {
+				printf("Sem matricula para cancelamento\n");
+			}
+			else {
+				do
+				{
+					printf("Digite quantas disciplinas serao desmatriculadas:\n");
+					scanf("%d", &qtdDis);
+				} while (qtdDis > 20);
+
+				imprimeDisciplinas(indiceDis, disciplinas);
+
+				for (i = 0; i < qtdDis; i++) {
+					printf("Digite codigo da disciplina:\n");
+					scanf("%d", &codAtual);
+					if (existeDisciplina(codAtual, indiceDis, disciplinas) == 1) {
+						grupoDisciplina[i] = codAtual;
+					}
+					else {
+						printf("Disciplina nao cadastrado!\n");
+						i--;
+					}
+				}
+
+
+				printf("Digite quantos alunos serao desmatriculados:\n");
+				scanf("%d", &qtd);
+				imprimeAlunos(indiceAluno, alunos);
+				for (i = 0; i < qtd; i++) {
+					printf("Digite ra do aluno:\n");
+					scanf("%d", &raAtual);
+					if (existeAluno(raAtual, indiceAluno, alunos) == 1) {
+						cancelarDisciplina(buscarAluno(raAtual, indiceAluno, alunos), alunos, qtdDis, grupoDisciplina);
+					}
+					else {
+						printf("Aluno nao cadastrado!\n");
+						i--;
+					}
+				}
+			}
+	
+
+			break;
+		case cancelarProfessor:
 			do
 			{
-				printf("Digite quantas disciplinas serao desmatriculadas:\n");
+				printf("Digite quantas disciplinas serao desalocadas:\n");
 				scanf("%d", &qtdDis);
 			} while (qtdDis>20);
 
@@ -252,24 +327,20 @@ void main() {
 				}
 			}
 
-
-			printf("Digite quantos alunos serao desmatriculados:\n");
+			printf("Digite quantos professores serao desalocados:\n");
 			scanf("%d", &qtd);
-			imprimeAlunos(indiceAluno, alunos);
+			imprimeProfessores(indiceProf, professores);
 			for (i = 0; i < qtd; i++) {
-				printf("Digite ra do aluno:\n");
-				scanf("%d", &raAtual);
-				if (existeAluno(raAtual, indiceAluno, alunos) == 1) {
-					cancelarDisciplina(buscarAluno(raAtual, indiceAluno, alunos), alunos, qtdDis, grupoDisciplina);
+				printf("Digite rg do professor:\n");
+				scanf("%d", &rgAtual);
+				if (existeProfessor(rgAtual, indiceProf, professores) == 1) {
+					cancelarDisciplina2(buscarProfessor(rgAtual, indiceProf, professores), professores, qtdDis, grupoDisciplina);
 				}
 				else {
-					printf("Aluno nao cadastrado!\n");
+					printf("Professor nao cadastrado!\n");
 					i--;
 				}
 			}
-
-			break;
-		case cancelarProfessor:
 			break;
 		case imprimirAluno:
 			imprimeAlunos(indiceAluno, alunos);
@@ -289,7 +360,6 @@ void main() {
 			}
 			else {
 				printf("Aluno nao cadastrado!\n");
-
 			}
 
 			break;
@@ -459,8 +529,7 @@ void matricularAlunos(int posAluno, aluno *alunos, int qtdDis, int *grupoDiscipl
 				alunos[posAluno].disciplinas[j] = grupoDisciplinas[l];
 				alunos[posAluno].qtdDisci++;
 				l++;
-			}
-
+				}
 		}
 		else {
 			for (j = materias - 1; j < 20; j++) {
@@ -545,20 +614,32 @@ void cancelarDisciplina(int posAluno, aluno *alunos, int qtdDis, int *grupoDisci
 	}
 }
 
+void cancelarDisciplina2(int posProf, professor *professores, int qtdDis, int *grupoDisciplinas) {
+	int j, k, l;
+	for (l = 0; l < qtdDis; l++) {
+		if (professores[posProf].qtdDisci != 0) {
+			for (k = 0; k < professores[posProf].qtdDisci; k++) {
+				if (professores[posProf].disciplinas[k] == grupoDisciplinas[l]) {
+					excluiDoVetor2(posProf, k, professores);
+				}
+			}
+		}
+	}
+}
+
 void alocarProfessores(int posProf, professor *professores, int qtdDis, int *grupoDisciplinas) {
 	int j, k = 0, materias, l = 0;
 	materias = professores[posProf].qtdDisci;
-	//printf("%d", materias);
+	printf("%d", materias);
 	if (materias >= 20) {
 		printf("Este professor ja esta cadastrado em muitas disiciplinas!\n");
 	}
 	else {
 		if (materias == 0) {
 			for (j = 0; j < qtdDis; j++) {
-				professores[posProf].disciplinas[j] = grupoDisciplinas[l];
+				professores[posProf].disciplinas[j] = grupoDisciplinas[j];
 				professores[posProf].qtdDisci++;
-				printf("cadastrei %d!\n", grupoDisciplinas[l]);
-				l++;
+				//l++;
 			}
 
 		}
@@ -603,7 +684,7 @@ void imprimirProfPorDisciplina(int codAtual, int tamanho, professor *professores
 	int j, k;
 	printf("--------------Professores---------------\n");
 	for (j = 0; j < tamanho; j++) {
-		if (professores[j].qtdDisci != 0) {
+		if (professores[j].qtdDisci > 0) {
 			for (k = 0; k < professores[j].qtdDisci; k++) {
 				if (professores[j].disciplinas[k] == codAtual) {
 					printf("%d\n", professores[j].rg);
@@ -611,4 +692,35 @@ void imprimirProfPorDisciplina(int codAtual, int tamanho, professor *professores
 			}
 		}
 	}
+}
+
+void excluiDoVetor2(int posProf, int posDisc, professor *professores) {
+	int j;
+	if (professores[posProf].qtdDisci == 1) {
+		professores[posProf].disciplinas[posDisc] = 0;
+	}
+	else {
+		for (j = posDisc; j < professores[posProf].qtdDisci; j++) {
+
+			if (j == (professores[posProf].qtdDisci - 1)) {
+				professores[posProf].disciplinas[j] = 0;
+			}
+			else {
+				professores[posProf].disciplinas[j] = professores[posProf].disciplinas[j + 1];
+			}
+		}
+
+	}
+
+	professores[posProf].qtdDisci--;
+}
+
+int existeNoVetor(int tamanho, int *vetor, int valorAtual) {
+	int i;
+	for (i = 0; i < tamanho; i++) {
+		if (vetor[i] == valorAtual) {
+			return 1;
+		}
+	}
+	return 0;
 }
